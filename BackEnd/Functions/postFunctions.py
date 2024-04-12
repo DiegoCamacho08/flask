@@ -152,3 +152,19 @@ def setImage(strTitulo):
     except Exception as e:
         print("Error al subir imagen:", e)
         return jsonify(ResponseMessages.message500)
+    
+def getAllCategory():
+    try:
+        objFindColab = dbConnPost.find({}, { 'strCategoria': 1 })
+        listColab = list(objFindColab)
+        
+        for colab in listColab:
+            # Convierto el ObjectId en string para que me lo acepte el programa
+            colab['_id'] = str(colab['_id'])
+            
+        # Crear un diccionario con la clave 'Response' y la lista de colaboradores como valor
+        response_data = {'Response': listColab}
+        return jsonify(response_data)
+    except Exception as e:
+        print("error get colaboradores:", e)
+        return jsonify({'message': 'Internal Server Error'}), 500

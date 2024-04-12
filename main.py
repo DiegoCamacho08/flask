@@ -39,6 +39,16 @@ def fnGetLastChisme():
     except Exception as e:
         print("Error al buscar chisme:", e)
         return jsonify(ResponseMessage.message500)
+    
+
+@app.route('/categoria', methods=['GET'])
+def fnGetAllCategory():
+    try:
+        objResult = callMethodPost.getAllCategory()
+        return objResult
+    except Exception as e:
+        print("Error al buscar chisme:", e)
+        return jsonify(ResponseMessage.message500)
 
 
 @app.route('/newchisme', methods=['POST'])
