@@ -23,56 +23,29 @@ def getChisme():
         listColab = list(objFindColab)
         
         for colab in listColab:
-            # Convierto el ObjectId en string para que me lo acepte el programa
-            colab['_id'] = str(colab['_id'])
+            colab['_id'] = str(colab['_id'])  # Convierte ObjectId a string
             
-            # Convertir bytes de la imagen a imagen
-            img_bytes = colab['binImage']
-            img = Image.open(BytesIO(img_bytes))
-            
-            # Convertir la imagen a base64
-            buffered = BytesIO()
-            img.save(buffered, format="PNG")  # Puedes cambiar el formato según tu necesidad
-            img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-            
-            colab['image'] = img_str  # Añadir la imagen codificada al diccionario
-            
-            # Eliminar la propiedad binImage si no es necesaria después de convertirla a imagen
-            del colab['binImage']
+            # Verificar si existe la imagen y si no está vacía
+            if 'binImage' in colab and colab['binImage']:
+                # Procesar la imagen
+                img_bytes = colab['binImage']
+                img = Image.open(BytesIO(img_bytes))
+                
+                buffered = BytesIO()
+                img.save(buffered, format="PNG")  # Cambia el formato si es necesario
+                img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                
+                colab['image'] = img_str  # Añadir la imagen codificada al diccionario
+                del colab['binImage']  # Eliminar la propiedad binImage
+            else:
+                # Establecer la imagen como None o quitar la propiedad si no se desea guardar
+                colab['image'] = None
         
-        # Crear un diccionario con la clave 'Response' y la lista de colaboradores como valor
         response_data = {'Response': listColab}
         return jsonify(response_data)
     except Exception as e:
         print("error get colaboradores:", e)
-        return jsonify(ResponseMessages.message500)
-
-def postChisme():
-    try:
-        data = request.get_json()
-        titulo = data.get('strTitulo')
-        chisme = data.get('strChisme')
-        usuario = data.get('strUsuario')
-        categoria = data.get('strCategoria')
-        
-        nuevo_chisme = {
-            'strTitulo': titulo,
-            'strChisme': chisme,
-            'strUsuario': usuario,
-            'strCategoria': categoria
-        }
-        
-        resultado = dbConnPost.insert_one(nuevo_chisme)
-        
-        if resultado.inserted_id:
-            nuevo_chisme['_id'] = str(resultado.inserted_id)
-            return jsonify(nuevo_chisme), 200
-        else:
-            return jsonify(ResponseMessages.message500), 500
-    except Exception as e:
-        print('Error al agregar chisme', e)
-        return jsonify(ResponseMessages.message500), 500
-    
+        return jsonify({'error': 'Internal Server Error'}), 500    
     
 def postLikes(_id):
     try:
