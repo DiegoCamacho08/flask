@@ -45,7 +45,34 @@ def getChisme():
         return jsonify(response_data)
     except Exception as e:
         print("error get colaboradores:", e)
-        return jsonify({'error': 'Internal Server Error'}), 500    
+        return jsonify({'error': 'Internal Server Error'}), 500  
+
+def postChisme():
+    try:
+        data = request.get_json()
+        titulo = data.get('strTitulo')
+        chisme = data.get('strChisme')
+        usuario = data.get('strUsuario')
+        categoria = data.get('strCategoria')
+        
+        nuevo_chisme = {
+            'strTitulo': titulo,
+            'strChisme': chisme,
+            'strUsuario': usuario,
+            'strCategoria': categoria
+        }
+        
+        resultado = dbConnPost.insert_one(nuevo_chisme)
+        
+        if resultado.inserted_id:
+            nuevo_chisme['_id'] = str(resultado.inserted_id)
+            return jsonify(nuevo_chisme), 200
+        else:
+            return jsonify(ResponseMessages.message500), 500
+    except Exception as e:
+        print('Error al agregar chisme', e)
+        return jsonify(ResponseMessages.message500), 500
+    
     
 def postLikes(_id):
     try:
