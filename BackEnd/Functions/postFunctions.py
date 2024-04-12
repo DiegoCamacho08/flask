@@ -1,12 +1,9 @@
-import base64
 from flask import request, jsonify
 from pymongo import MongoClient
 from bson import ObjectId
 from flask_cors import CORS
 import BackEnd.GlobalInfo.Keys as PracticaKeys
 import BackEnd.GlobalInfo.ResponseMessages as ResponseMessages
-from PIL import Image
-from io import BytesIO
 
 if PracticaKeys.dbconn == None:
     mongoConnect = MongoClient(PracticaKeys.strConnection)
@@ -25,20 +22,6 @@ def getChisme():
         for colab in listColab:
             # Convierto el ObjectId en string para que me lo acepte el programa
             colab['_id'] = str(colab['_id'])
-            
-            # Convertir bytes de la imagen a imagen
-            img_bytes = colab['binImage']
-            img = Image.open(BytesIO(img_bytes))
-            
-            # Convertir la imagen a base64
-            buffered = BytesIO()
-            img.save(buffered, format="PNG")  # Puedes cambiar el formato según tu necesidad
-            img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-            
-            colab['image'] = img_str  # Añadir la imagen codificada al diccionario
-            
-            # Eliminar la propiedad binImage si no es necesaria después de convertirla a imagen
-            del colab['binImage']
         
         # Crear un diccionario con la clave 'Response' y la lista de colaboradores como valor
         response_data = {'Response': listColab}
