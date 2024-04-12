@@ -53,11 +53,13 @@ def postChisme():
         titulo = data.get('strTitulo')
         chisme = data.get('strChisme')
         usuario = data.get('strUsuario')
+        categoria = data.get('strCategoria')
         
         nuevo_chisme = {
             'strTitulo': titulo,
             'strChisme': chisme,
             'strUsuario': usuario,
+            'strCategoria': categoria
         }
         
         resultado = dbConnPost.insert_one(nuevo_chisme)
