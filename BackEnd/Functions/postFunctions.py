@@ -105,6 +105,37 @@ def postImage():
     except Exception as e:
         print("Error al procesar la solicitud:", e)
         return jsonify(ResponseMessages.message500)
+    
+def getLastImage():
+    try:
+        objFindColab = dbConnPost.find({}, { 'binImage': 1 }).sort('_id', -1).limit(3)
+        listColab = list(objFindColab)
+        
+        for colab in listColab:
+            # Convierto el ObjectId en string para que me lo acepte el programa
+            colab['_id'] = str(colab['_id'])
+            
+            # Convertir bytes de la imagen a imagen
+            img_bytes = colab['binImage']
+            img = Image.open(BytesIO(img_bytes))
+            
+            # Convertir la imagen a base64
+            buffered = BytesIO()
+            img.save(buffered, format="PNG")  # Puedes cambiar el formato según tu necesidad
+            img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+            
+            colab['image'] = img_str  # Añadir la imagen codificada al diccionario
+            
+            # Eliminar la propiedad binImage si no es necesaria después de convertirla a imagen
+            del colab['binImage']
+        
+        # Crear un diccionario con la clave 'Response' y la lista de colaboradores como valor
+        response_data = {'Response': listColab}
+        return jsonify(response_data)
+    except Exception as e:
+        print("error get colaboradores:", e)
+        return jsonify({'message': 'Internal Server Error'}), 500
+        
 
     
 def setImage(strTitulo):

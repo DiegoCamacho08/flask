@@ -30,6 +30,15 @@ def fnGetChisme():
     except Exception as e:
         print("Error al buscar chisme:", e)
         return jsonify(ResponseMessage.message500)
+    
+@app.route('/lastchisme', methods=['GET'])
+def fnGetLastChisme():
+    try:
+        objResult = callMethodPost.getLastImage()
+        return objResult
+    except Exception as e:
+        print("Error al buscar chisme:", e)
+        return jsonify(ResponseMessage.message500)
 
 
 @app.route('/newchisme', methods=['POST'])
